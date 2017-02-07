@@ -3,7 +3,11 @@
 /**
  * Launcher for mScan (directory scanner and reporter)
  * 
- * For details look docblock of mScan class, this file is just launcher.
+ * Copyright (c) 2016 Tekod labs.
+ *  
+ * Miroslav Ćurčić <office@tekod.com>
+ * 
+ * For description look at docblock of mScan class, this file is just launcher.
  * 
  * Customize this file for your use-case but keep main class unmodified.
  * If you need to modify main class contact author to implement feature
