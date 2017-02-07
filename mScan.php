@@ -6,18 +6,35 @@
  * Copyright (c) 2016 Tekod labs.
  *  
  * Miroslav Ćurčić <office@tekod.com>
- *
+ * 
+ * mScan is utility for monitoring changes on important files on your hosting,
+ * comparing timestamps and hashs with values stored from last pass.
+ * 
+ * If differences found report will be generated and sent to admin's email
+ * (if configured) and displayed in browser (if called from browser).
+ * 
+ * To decrease scanning time utility will typicaly scan only files interested 
+ * for hackers (php, js, htm, html) but can be configured to scan all files.
+ * 
+ * Through constructor you can intialize any property, there is description 
+ * above each of them.
+ * 
+ * Please note that storage file (mScan.dat by default) need to be writable.
+ * 
+ * Launcher for this class typicaly should be called by "cron" system 
+ * (in CLI enviroment) but successfully works in web context too.
+ * 
  * @author Miroslav Ćurčić <office@tekod.com>
  * @copyright 2016 Tekod labs - http://www.tekod.com
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @version 0.3.1
+ * @version 0.3.2
  */
 
 
 class mScan {
     
     // version number
-    protected $Version= '0.3.1';
+    protected $Version= '0.3.2';
 
     // locations where to perform scanning
     protected $PathsToScan= array(
@@ -43,8 +60,8 @@ class mScan {
     );
     
     // for files lighter then this value use internal PHP's hash function
-    // hash for larger files will be calculated manualy
-    protected $HashFileLimit= 2048000;
+    // hash for larger files will be calculated manualy (slower)
+    protected $HashFileLimit= 2048000;  // 2 Mb by default
             
     // dictionary for output messages,
     // use this configuration to translate/customize output report
@@ -284,7 +301,7 @@ class mScan {
             $PlainReport= str_replace("\t", ' ', $PlainReport); // convert tabs to spaces
             $PlainReport= preg_replace('/\s+/', ' ',$PlainReport); // compress multispaces
             $PlainReport= preg_replace('/\s*<br>\s*/', "\r\n", $PlainReport); // convert <br> to nl
-            $PlainReport= str_replace('<hr>',"\r\n".str_repeat('-',65)."\r\n", $PlainReport); // <hr>               
+            $PlainReport= str_replace('<hr>',"\r\n".str_repeat('-',65)."\r\n", $PlainReport); // <hr>    
             $PlainReport= trim(strip_tags($PlainReport));  // remove tags
             // send email
             mail($ToAddress, $Subject, $PlainReport, $Headers);            
