@@ -27,14 +27,14 @@
  * @author Miroslav Ćurčić <office@tekod.com>
  * @copyright 2016 Tekod labs - http://www.tekod.com
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @version 0.3.2
+ * @version 0.3.3
  */
 
 
 class mScan {
     
     // version number
-    protected $Version= '0.3.2';
+    protected $Version= '0.3.3';
 
     // locations where to perform scanning
     protected $PathsToScan= array(
@@ -81,22 +81,18 @@ class mScan {
             .'<br>Last scanning occured on %s</small><br><br>';
 
 
-    // internal vars
-    
-    protected $IsExecDisabled;
-    
+    // internal vars    
+    protected $IsExecDisabled;    
     protected $IsCLI;
-
-    protected $ExistingFiles;
-    
-    protected $KnownFiles;
-    
+    protected $ExistingFiles;    
+    protected $KnownFiles;    
     protected $Report;
-
     protected $LastTimestamp;
 
 
-
+    /**
+     * Contructor.
+     */
     public function __construct($Options=array()) {
                      
         // ensure relative paths works 
@@ -125,6 +121,9 @@ class mScan {
     }
     
     
+    /**
+     * Execution entry point.
+     */
     public function Run() {
         
         // get list of exising files
@@ -140,10 +139,13 @@ class mScan {
         $this->StoreKnownFiles();
         
         // output report
-        $this->SendReport();
+        $this->Report();
     }    
     
 
+    /**
+     * Scan files in all configured directories.
+     */
     protected function GetExistingFiles() {
         
         $this->ExistingFiles= array();
@@ -153,6 +155,12 @@ class mScan {
     }
     
 
+    /**
+     * Recursively scan files in specified directory.
+     * 
+     * @param string $StartPath  target directory
+     * @param string $Dir  subdirectory
+     */
     protected function ScanDirectory($StartPath, $Dir) {
 
         $Path= str_replace('\\','/',$StartPath).$Dir;  // concat path
@@ -184,6 +192,12 @@ class mScan {
     }
  
     
+    /**
+     * Calculate hash for specified file.
+     * 
+     * @param string $Path  full path to target file
+     * @return string  hash
+     */
     protected function GetHash($Path) {
         
         // for files less then 2Mb (by default) use PHP's internal hash_file() ...
@@ -211,6 +225,9 @@ class mScan {
     }
     
     
+    /**
+     * Load storage file and populate internal collection of known files.
+     */
     protected function GetKnownFiles() {
         
     $Dump= file_get_contents($this->StorageLocation);
@@ -232,6 +249,9 @@ class mScan {
     }
     
     
+    /**
+     * Save list of found files to storage file.
+     */
     protected function StoreKnownFiles() {
         
         $Pack= array();
@@ -242,6 +262,10 @@ class mScan {
     }
     
     
+    /**
+     * Perform comparasion between lists of previosly known files and list of current files
+     * and prepare information for output report.
+     */
     protected function Compare() {
         
         $KnownFiles= array_keys($this->KnownFiles);
@@ -268,15 +292,45 @@ class mScan {
             $this->Report[]= sprintf($this->Messages['Mod'], $File, $Date);
         }        
     }
+        
+        
+    /**
+     * Create and dispatch report if any difference found.
+     */
+    protected function Report() {
+               
+        // generate report
+        $Report= $this->BuildReport();
+        
+        // if emailing enabled and differences found 
+        if ($this->EmailReport['Enabled'] && !empty($this->Report)) {
+            $this->SendEmail($Report);
+        }
+        
+        // show report if not triggered from CLI         
+        if (!$this->IsCLI) {
+            echo $Report;
+        } 
+        
+    }
     
     
-    protected function SendReport() {
+    /**
+     * Benerate content of report.
+     * 
+     * @return string
+     */
+    protected function BuildReport() {
         
         // prepare LastTime
         $Delta= time()-$this->LastTimestamp;
         $Ago= round($Delta / 86400).' days ago';
-        if ($Delta < 2*86400) $Ago= round($Delta / 3600).' hours ago';
-        if ($Delta < 2*3600) $Ago= round($Delta / 60).' minutes ago';        
+        if ($Delta < 2*86400) {
+            $Ago= round($Delta / 3600).' hours ago';
+        }
+        if ($Delta < 2*3600) {
+            $Ago= round($Delta / 60).' minutes ago';        
+        }
         $LastTimestamp= date('Y-m-d H:i:s', $this->LastTimestamp);
         $LastTime= $LastTimestamp.' ('.$Ago.')';
         
@@ -287,32 +341,32 @@ class mScan {
         $Count= count($this->ExistingFiles);
         $Now= date('Y-m-d H:i:s', time());
         $Ver= $this->Version;
-        $Report= sprintf($this->ReportTemplate, $Ver, $Content, $Count, $Now, $LastTime);        
-        
-        // if emailing enabled and differences found 
-        if ($this->EmailReport['Enabled'] && !empty($this->Report)) {
-            // prepare headers
-            $Subject= str_replace(array("\r","\n"), '', $this->EmailReport['Subject']);
-            $ToAddress= str_replace(array("\r","\n"), '', $this->EmailReport['ToAddress']);            
-            $FromAddress= str_replace(array("\r","\n"), '', $this->EmailReport['FromAddress']);
-            $Headers= "From: $FromAddress\r\nReply-To: $FromAddress\r\nX-Mailer: PHP/".phpversion();  
-            // de-HTML report
-            $PlainReport= str_replace(array("\n","\r"), '', $Report); // remove newlines
-            $PlainReport= str_replace("\t", ' ', $PlainReport); // convert tabs to spaces
-            $PlainReport= preg_replace('/\s+/', ' ',$PlainReport); // compress multispaces
-            $PlainReport= preg_replace('/\s*<br>\s*/', "\r\n", $PlainReport); // convert <br> to nl
-            $PlainReport= str_replace('<hr>',"\r\n".str_repeat('-',65)."\r\n", $PlainReport); // <hr>    
-            $PlainReport= trim(strip_tags($PlainReport));  // remove tags
-            // send email
-            mail($ToAddress, $Subject, $PlainReport, $Headers);            
-        }
-        
-        // show report if not triggered from CLI         
-        if (!$this->IsCLI) {
-            echo $Report;
-        } 
-        
+        $Report= sprintf($this->ReportTemplate, $Ver, $Content, $Count, $Now, $LastTime); 
+        return $Report;
     }
+    
+    
+    /**
+     * 
+     * @param type $Report
+     */
+    protected function SendEmail($Report) {
+        // prepare headers
+        $Subject= str_replace(array("\r","\n"), '', $this->EmailReport['Subject']);
+        $ToAddress= str_replace(array("\r","\n"), '', $this->EmailReport['ToAddress']);            
+        $FromAddress= str_replace(array("\r","\n"), '', $this->EmailReport['FromAddress']);
+        $Headers= "From: $FromAddress\r\nReply-To: $FromAddress\r\nX-Mailer: PHP/".phpversion();  
+        // de-HTML report
+        $PlainReport= str_replace(array("\n","\r"), '', $Report); // remove newlines
+        $PlainReport= str_replace("\t", ' ', $PlainReport); // convert tabs to spaces
+        $PlainReport= preg_replace('/\s+/', ' ',$PlainReport); // compress multispaces
+        $PlainReport= preg_replace('/\s*<br>\s*/', "\r\n", $PlainReport); // convert <br> to nl
+        $PlainReport= str_replace('<hr>',"\r\n".str_repeat('-',65)."\r\n", $PlainReport); // <hr>    
+        $PlainReport= trim(strip_tags($PlainReport));  // remove tags
+        // send email
+        mail($ToAddress, $Subject, $PlainReport, $Headers);        
+    }
+   
     
 }
 
