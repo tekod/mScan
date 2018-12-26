@@ -316,7 +316,7 @@ class mScan {
     
     
     /**
-     * Benerate content of report.
+     * Generate content of report.
      * 
      * @return string
      */
@@ -347,8 +347,9 @@ class mScan {
     
     
     /**
+     * Dispatch email to configured address.
      * 
-     * @param type $Report
+     * @param string $Report
      */
     protected function SendEmail($Report) {
         // prepare headers
