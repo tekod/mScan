@@ -4,7 +4,7 @@
 
 # What is this?
 
-mScan is program that will periodically scan all files on hosting and generate report if any differences found.
+mScan is program that will periodically scan all files on hosting and generate report if any differences found.  
 Report will be sent as email message to configured address or simply echoed if triggered by HTTP request.
 
 It will alert you if:
@@ -16,21 +16,21 @@ Also this program may help in "damage control" if automatic checking is set quit
 
 # How it works?
 
-Program scan directories and collect information about last modification (as date and time) and content (as hash) and writes that collection in storage file.
-Storage file is compressed to reduce filesize and somewhat obfuscate it.
-On next run program will scan directories again and compare time and hash of each file with stored information and generate report if differences are found.
+Program scan directories and collect information about last modification (as date and time) and content (as hash) and writes that collection in storage file.  
+Storage file is compressed to reduce filesize and somewhat obfuscate it.  
+On next run program will scan directories again and compare time and hash of each file with stored information and generate report if differences are found.  
 Report can be send via email to predefined address or echoed at terminal.
 
 There are two common usage cases: 
 * **as monitor** - setup cron to periodacally run scanning, setup and forget aboput it
 * **as tool** - setup and run it manually when needed, both via HTTP or CLI protocol
 
-Here is example how email message may looks like
+Here is example how email message may looks like  
 (obviously this report was generated after one of wordpress updates)
 
-<sub><sup><pre>
+<sub><sup>
 >mScan ver. 0.3.1
->-----------------------------------------------------------------
+>\-----------------------------------------------------------------
 >
 >Differences found:
 >
@@ -40,21 +40,21 @@ Here is example how email message may looks like
 >Modified file: /home/pspen/public_html/wp-includes/version.php {2018-01-17 00:49:09}
 >
 >
->-----------------------------------------------------------------
+>\-----------------------------------------------------------------
 >Found 8840 files
 >Timestamp: 2018-01-17 02:00:10
 >Last scanning occured on 2018-01-17 00:00:09 (2 hours ago)
-</pre></sup></sub>
+</sup></sub>
 
 ## Security concern
 
-Remember that storage file contains list of all your files.
-In order to hide that sensitive information storage file (or whole package) has to be stored in location that are innacessible from web.
+Remember that storage file contains list of all your files.  
+In order to hide that sensitive information storage file (or whole package) has to be stored in location that are innacessible from web.  
 Best solution is to locate it out of DOCUMENT_ROOT directory but if that is not posible protect it with .htaccess.
 
-Note about calling index.php via HTTP request:
+Note about calling index.php via HTTP request:  
 remember that program will takes a lot of time and consume server resources to run so if you let it public accessible and
-maliciuos visitor figure out its URL he can produce DOS attack on your server by dispatching bunch of calls to it.
+maliciuos visitor figure out its URL he can produce DOS attack on your server by dispatching bunch of calls to it.  
 Do not left program acessible from web for long time.
 
 # Installation
@@ -90,7 +90,7 @@ Perform following steps to install it:
 
 # Translation / localization
 
-Output report can be fully localized by modifying configuration options "Messages" and "ReportTemplate".
+Output report can be fully localized by modifying configuration options "Messages" and "ReportTemplate".  
 All strings contained in output report are exposed there.
 
 ---
