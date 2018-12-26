@@ -1,9 +1,11 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Issues](https://img.shields.io/github/issues/tekod/mScan.svg)](https://github.com/tekod/mScan/issues)
 
 # What is this?
 
-mScan je program koji periodično pregleda sve datoteke na vašem hostingu i ako uoči promene pošalje vam email sa detaljnim listingom.
+mScan is program that will periodically scan all files on hosting and generate report if any differences found.
+Report will be sent as email message to configured address or simply echoed if triggered by HTTP request.
 
 It will alert you if:
 * **your developer upload new version of code** - so you can track which part of site he touched
@@ -25,22 +27,23 @@ There are two common usage cases:
 
 Here is example how email message may looks like
 (obviously this report was generated after one of wordpress updates)
+
 <sub><sup><pre>
-mScan ver. 0.3.1
------------------------------------------------------------------
-
-Differences found:
-
-Modified file: /home/jpspens/public_html/wp-admin/includes/update-core.php {2018-01-17 00:49:08}
-Modified file: /home/jpspens/public_html/wp-admin/about.php {2018-01-17 00:49:09}
-Modified file: /home/jpspens/public_html/readme.html {2018-01-17 00:49:09}
-Modified file: /home/jpspens/public_html/wp-includes/version.php {2018-01-17 00:49:09}
-
-
------------------------------------------------------------------
-Found 8840 files
-Timestamp: 2018-01-17 02:00:10
-Last scanning occured on 2018-01-17 00:00:09 (2 hours ago)
+>mScan ver. 0.3.1
+>-----------------------------------------------------------------
+>
+>Differences found:
+>
+>Modified file: /home/pspen/public_html/wp-admin/includes/update-core.php {2018-01-17 00:49:08}
+>Modified file: /home/pspen/public_html/wp-admin/about.php {2018-01-17 00:49:09}
+>Modified file: /home/pspen/public_html/readme.html {2018-01-17 00:49:09}
+>Modified file: /home/pspen/public_html/wp-includes/version.php {2018-01-17 00:49:09}
+>
+>
+>-----------------------------------------------------------------
+>Found 8840 files
+>Timestamp: 2018-01-17 02:00:10
+>Last scanning occured on 2018-01-17 00:00:09 (2 hours ago)
 </pre></sup></sub>
 
 ## Security concern
